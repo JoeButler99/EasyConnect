@@ -1,0 +1,17 @@
+---
+config:
+  terminal_binary:     "/usr/bin/xfce4-terminal"
+  browser_binary:      "/usr/bin/google-chrome"
+  ssh-copy-id-binary : "/usr/bin/ssh-copy-id"
+  log_file:            "easyconnect.log"
+
+users:
+  - joe:
+    password: 
+  - Joe.Butler:
+    password: 
+
+groups:
+  localhost: 
+    user: joe
+    - localhost
