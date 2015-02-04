@@ -1,7 +1,4 @@
 ---
-# If you run into problems, you can test validate yaml easily at: 
-# http://yaml-online-parser.appspot.com/ 
-
 config:
   terminal_binary:     "/usr/bin/xfce4-terminal"
   browser_binary:      "/usr/bin/google-chrome"
@@ -12,21 +9,27 @@ users:
   - joe:
     password: 
   - Joe.Butler:
-    password: 
+    password:
+    is_default: true
 
-groups:
-  localhost: 
-    user: joe
+hosts:
+  Local:
     - localhost
-
-  test-servers:
-    user: joe
-    groupA:
-      - 10.1.1.2
-      - 10.1.1.3
-      - 10.1.1.4
-    groupB:
-      - 10.2.1.20
-      - 10.2.1.30
-      - 10.2.1.40
+    - 127.0.0.1
+  WorkMachines:
+    Dev:
+      - hostname001
+      - hostname002
+      - hostname003
+      - hostname004
+    Test:
+      - 10.0.0.1
+      - 10.0.0.2
+      - 10.0.0.3
+    Prod: 
+      - ftppm516-lvuk-uk-p
+      - ftppm520-lvuk-uk-p
+      - ftppm515-lvuk-uk-p
+      - ftppm519-lvuk-uk-p
+      - ftppm517-lvuk-uk-p
 
