@@ -1,11 +1,15 @@
 from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int
 
 class Host:
-    def __init__(self,hostname):
+    def __init__(self,hostname,config):
         self.name         = hostname
+        self.config       = config
+        
+    def action(self):
+        print 
 
 class HostGroup:
-    def __init__(self,name,parent=None,prompt="Select Choice: "):
+    def __init__(self,name,config,parent=None,prompt="Select Choice: "):
         self.name       = name
         self.members    = []
         self.parent     = parent
@@ -59,6 +63,7 @@ class HostGroup:
                 return None
             else:
                 self.members[ichoice-1].action()
+                return True
 #         else:
 #             achoice = self.check_action(choice)
 #             if achoice:
@@ -67,16 +72,16 @@ class HostGroup:
 #                 write_in_color("\nBAD CHOICE!\n",bcolors.FAIL)
 
 
-def build_from_config(config,parent):
+def build_from_config(config,parent,yaml_config):
     """
         Takes a yaml config, and recurses over the hosts to
         replicate the groups and hosts structure.
     """
     for name , members in config.iteritems():
-        hg = HostGroup(name,parent=parent)
+        hg = HostGroup(name,yaml_config,parent=parent)
         if isinstance(members, dict):
-            build_from_config(members, hg)
+            build_from_config(members, hg,yaml_config)
         else:
             for hostname in members:
-                hg.add_member(Host(hostname))
+                hg.add_member(Host(hostname,yaml_config))
         parent.add_member(hg)
