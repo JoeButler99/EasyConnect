@@ -19,11 +19,13 @@ class YAMLConfigLoader:
         except yaml.parser.ParserError as e:
             print "\n"
             print e
-            quit_script("Configuration error found in config.yaml. Please check YAML syntax.", 2)
+            quit_script("Configuration error found in config.yaml. Please check YAML syntax.", 3)
             
-            
-    def get_tokens(self,key):
-        try:
-            return self.config['tokens'][key]
-        except:
-            print "Did not find config for module: %s. Has this been configured in config.yaml?" % key
+    def get_hosts(self):
+        if self.config.has_key("hosts"):
+            if isinstance(self.config['hosts'],dict):
+                return self.config['hosts']
+            else:
+                quit_script("config.yaml has an error in the 'hosts' section. This should be a map of groups and hosts. See config.yaml.example for a prototype.", 3)
+        else:
+            quit_script("config.yaml has no 'hosts' section. Unable to continue.", 3)
