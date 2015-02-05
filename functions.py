@@ -1,5 +1,7 @@
 import sys
 import os
+from modules import *
+import inspect
 
 
 class bcolors:
@@ -45,3 +47,9 @@ def check_int(choice,max_choice):
             return None
     except:
         return None
+    
+    
+    
+def display_all_modules():
+    available_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
+    return str(available_modules)

@@ -4,8 +4,8 @@ Created on 24 Jan 2015
 @author: joe
 '''
 import yaml
-
-from functions import quit_script
+import argparse
+from functions import quit_script, display_all_modules
 
 class YAMLConfigLoader:
     
@@ -32,3 +32,18 @@ class YAMLConfigLoader:
             
 
         
+        
+class CLIParser:
+    
+    def __init__(self):
+        self.parser = self.create_parser()
+        self.parser.parse_args()
+    
+    def create_parser(self):
+        parser = argparse.ArgumentParser(description="EasyConnect CLI Toolkit")
+        parser.add_argument("-g", "--group", action="store", dest="group", required=True,type=str)
+        parser.add_argument("-a", "--action", action="store", dest="action", required=True,type=str)
+        # Cheat below - I've repurposed the version exception to handle module listing
+        parser.add_argument("-l", "--list-available-actions", action="version", version=display_all_modules())
+        
+        return parser
