@@ -1,12 +1,40 @@
+import inspect
+import sys
 from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int
+from modules import *
 
 class Host:
     def __init__(self,hostname,config):
         self.name         = hostname
         self.config       = config
         
-    def action(self):
-        print 
+    def action(self,action_name=None):
+        """
+            Action trys to run the action. Based on the action name it
+            will try to dynamically instantiate a class and excute the
+            required method.
+        """
+        available_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
+        
+        # Make sure we have a module to execute
+        if not action_name:
+            action_name = self.config.get_section('config')['default_host_action']
+            
+        parts = action_name.split("::")
+        if len(parts) != 2:
+            raise Exception("Error with default_host_action in config. See config.yaml.example for a working example")
+        else:
+            classname , methodname = parts
+        if classname not in available_modules.keys():
+            raise Exception
+        
+        # Create a class instance and check the method exists.
+        # then run the bastard...
+        action_module = available_modules[classname]()
+        method = getattr(action_module, methodname)
+        method(self.name,self.config)
+        
+        
 
 class HostGroup:
     def __init__(self,name,config,parent=None,prompt="Select Choice: "):
@@ -27,7 +55,7 @@ class HostGroup:
 
     def display_menu(self):
         while True:
-            clear_screen()
+            #clear_screen()
             try:
                 # Create the display
                 max_choice = 1

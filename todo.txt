@@ -5,3 +5,6 @@ Examples.md
 parallel commands system
 select items from group system
 get rid of weird character after a choice is made
+config check to make sure all required keys are set
+Should we tidy up to 80char terminal width in code??
+merge quit_script and Exception throwing into consistent system

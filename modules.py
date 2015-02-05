@@ -6,9 +6,18 @@ Created on 4 Feb 2015
 import os
 import subprocess
 
+"""
+        You should just be able to add new modules in here and they will work as
+        if by magic in the rest of the program. :-)
+
+"""
+
 
 class Shell:
-    def open_ssh_terminal(self,hostname,user,config):
+    def open_ssh_terminal(self,hostname,config):
+        config  = config.get_section('config')
         command = "{0} -e 'ssh {1}@{2}' &".format(config['terminal_binary'],
-                                                  user, hostname)
-        os.system(command)
+                                                  config['default_user'], 
+                                                  hostname)
+        test = os.system(command)
+        print test

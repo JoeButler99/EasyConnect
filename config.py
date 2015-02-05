@@ -21,11 +21,14 @@ class YAMLConfigLoader:
             print e
             quit_script("Configuration error found in config.yaml. Please check YAML syntax.", 3)
             
-    def get_hosts(self):
-        if self.config.has_key("hosts"):
-            if isinstance(self.config['hosts'],dict):
-                return self.config['hosts']
+    def get_section(self,section):
+        if self.config.has_key(section):
+            if isinstance(self.config[section],dict):
+                return self.config[section]
             else:
-                quit_script("config.yaml has an error in the 'hosts' section. This should be a map of groups and hosts. See config.yaml.example for a prototype.", 3)
+                quit_script("config.yaml has an error with the '{0}' section. See config.yaml.example for a prototype.".format(section), 3)
         else:
-            quit_script("config.yaml has no 'hosts' section. Unable to continue.", 3)
+            quit_script("config.yaml has no '{0}' section. Unable to continue.".format(section), 3)
+            
+
+        
