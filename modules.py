@@ -9,7 +9,7 @@ import subprocess
 """
         You should just be able to add new modules in here and they will work as
         if by magic in the rest of the program. :-)
-
+        
 """
 
 

@@ -3,6 +3,7 @@ Created on 24 Jan 2015
 
 @author: joe
 '''
+import os
 import yaml
 import argparse
 from functions import quit_script, display_all_modules
@@ -10,9 +11,11 @@ from functions import quit_script, display_all_modules
 class YAMLConfigLoader:
     
     def __init__(self,filename="config.yaml"):
+        path = os.path.dirname(__file__)
         self.config = {}
         try:
-            with open(filename,'r') as f:
+
+            with open(path+"/"+filename,'r') as f:
                 self.config = yaml.load(f.read())
         except IOError:
             quit_script("Error opening config.yaml", 2)
@@ -37,7 +40,7 @@ class CLIParser:
     
     def __init__(self):
         self.parser = self.create_parser()
-        self.parser.parse_args()
+        self.args, self.extra_args = self.parser.parse_known_args()
     
     def create_parser(self):
         parser = argparse.ArgumentParser(description="EasyConnect CLI Toolkit")
@@ -47,3 +50,15 @@ class CLIParser:
         parser.add_argument("-l", "--list-available-actions", action="version", version=display_all_modules())
         
         return parser
+    
+    
+class CLIExecutor:
+    """ 
+        Handle running the program as specified by the CLI args
+    """
+    def __init__(self,cli_parser):
+        assert isinstance(cli_parser, CLIParser), "CLIExecutor needs argument of type CLIParser"
+        self.parser = cli_parser
+        
+    def run(self):
+        pass
