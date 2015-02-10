@@ -6,6 +6,8 @@ About
 Setup
 =====
 
+ Clone the repo and run pip install -r requirements.txt
+
  * VirtualEnv
 
 
