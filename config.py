@@ -67,7 +67,12 @@ class CLIParser:
         use_hosts = yaml_config.get_section("hosts")
         try:
             for g in self.args.group.split("::"):
-                use_hosts = use_hosts[g]
+                if isinstance(use_hosts,dict):
+                    use_hosts = use_hosts[g]
+                else:
+                    # If use_hosts is not a dict, we should be looking for a 
+                    # hostname within the group
+                    use_hosts = [g]
         except KeyError:
             quit_script("Did not find group {0} in config.yaml ".format(self.args.group),4)
 

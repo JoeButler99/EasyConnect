@@ -2,9 +2,12 @@
 config:
   terminal_binary:     "/usr/bin/xfce4-terminal"
   browser_binary:      "/usr/bin/google-chrome"
-  ssh-copy-id-binary: "/usr/bin/ssh-copy-id"
+  ssh-copy-id-binary:  "/usr/bin/ssh-copy-id"
   log_file:            "easyconnect.log"
+  default_host_action: "Shell::open_ssh_terminal"
+  default_user:        "joe"
 
+# Create a list of users with their options. 
 users:
   - joe:
     password: 
@@ -12,24 +15,28 @@ users:
     password:
     is_default: true
 
+
+#
+#	A group can either contain other groups or a list of hosts. 
+#
 hosts:
   Local:
     - localhost
     - 127.0.0.1
-  WorkMachines:
+  Application:
     Dev:
-      - hostname001
-      - hostname002
-      - hostname003
-      - hostname004
+      - dev01.app.name.com
+      - dev02.app.name.com
+      - dev03.app.name.com
+      - dev04.app.name.com
     Test:
-      - 10.0.0.1
-      - 10.0.0.2
-      - 10.0.0.3
+      - test01.app.name.com
+      - test02.app.name.com
+      - test03.app.name.com
+      - test04.app.name.com
     Prod: 
-      - ftppm516-lvuk-uk-p
-      - ftppm520-lvuk-uk-p
-      - ftppm515-lvuk-uk-p
-      - ftppm519-lvuk-uk-p
-      - ftppm517-lvuk-uk-p
+      - prod01.app.name.com
+      - prod02.app.name.com
+      - prod03.app.name.com
+      - prod04.app.name.com
 

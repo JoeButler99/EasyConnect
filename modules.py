@@ -20,4 +20,3 @@ class Shell:
                                                   config['default_user'], 
                                                   hostname)
         test = os.system(command)
-        print test
