@@ -18,18 +18,23 @@ class Host:
         
         # Make sure we have a module to execute
         if not action_name:
+            default_used = True
             action_name = self.config.get_section('config')['default_host_action']
+        else:
+            default_used = False
             
         parts = action_name.split("::")
         if len(parts) != 2:
-            raise Exception("Error with default_host_action in config. See config.yaml.example for a working example")
+            if default_used:
+                quit_script("Error with default_host_action in config. See config.yaml.example for a working example", 5)
+            else:
+                quit_script("Could not perform action {0}. Does this exist in modules?".format(action_name), 5)
         else:
             classname , methodname = parts
         if classname not in available_modules.keys():
-            raise Exception
+            quit_script("Could not find class {0} in modules".format(classname), 5)
         
         # Create a class instance and check the method exists.
-        # then run the bastard...
         action_module = available_modules[classname]()
         method = getattr(action_module, methodname)
         method(self.name,self.config)
@@ -110,6 +115,8 @@ def build_from_config(config,parent,yaml_config):
         if isinstance(members, dict):
             build_from_config(members, hg,yaml_config)
         else:
+            if not members:
+                quit_script("Error in config.yaml - group '{0}' has no members".format(name), 3)
             for hostname in members:
                 hg.add_member(Host(hostname,yaml_config))
         parent.add_member(hg)

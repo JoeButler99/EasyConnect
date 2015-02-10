@@ -14,6 +14,7 @@ def run():
     
     if len(sys.argv) > 1:
         cli_parser = CLIParser()
+        cli_parser.run(yaml_config)
     else:
         # Give the user a menu system
         root_hostgroup.display_menu()

@@ -7,6 +7,7 @@ import os
 import yaml
 import argparse
 from functions import quit_script, display_all_modules
+from structures import Host
 
 class YAMLConfigLoader:
     
@@ -41,24 +42,39 @@ class CLIParser:
     def __init__(self):
         self.parser = self.create_parser()
         self.args, self.extra_args = self.parser.parse_known_args()
+
+    def flatten_groups(self,host_list,group):
+        if isinstance(group, dict):
+            for group_members in group.values():
+                self.flatten_groups(host_list, group_members)
+        else:
+            for host in group:
+                host_list.append(host)
+        return host_list
     
     def create_parser(self):
         parser = argparse.ArgumentParser(description="EasyConnect CLI Toolkit")
         parser.add_argument("-g", "--group", action="store", dest="group", required=True,type=str)
         parser.add_argument("-a", "--action", action="store", dest="action", required=True,type=str)
-        # Cheat below - I've repurposed the version exception to handle module listing
+        # Cheat below - I've 'repurposed' the version exception to handle module listing
         parser.add_argument("-l", "--list-available-actions", action="version", version=display_all_modules())
         
         return parser
     
-    
-class CLIExecutor:
-    """ 
-        Handle running the program as specified by the CLI args
-    """
-    def __init__(self,cli_parser):
-        assert isinstance(cli_parser, CLIParser), "CLIExecutor needs argument of type CLIParser"
-        self.parser = cli_parser
-        
-    def run(self):
-        pass
+    def run(self,yaml_config):
+        assert isinstance(yaml_config, YAMLConfigLoader) 
+        # Check the group exists, has hosts and grab it
+        use_hosts = yaml_config.get_section("hosts")
+        try:
+            for g in self.args.group.split("::"):
+                use_hosts = use_hosts[g]
+        except KeyError:
+            quit_script("Did not find group {0} in config.yaml ".format(self.args.group),4)
+
+        # If we have dict, then flatten it to get all hosts
+        if isinstance(use_hosts,dict):
+            use_hosts = self.flatten_groups([], use_hosts)
+
+        # Now we can create Host objects for the list of machines and run the action
+        [ Host(host,yaml_config).action(self.args.action) for host in use_hosts ]
+            

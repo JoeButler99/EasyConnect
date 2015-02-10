@@ -15,7 +15,6 @@ class bcolors:
     BOLD = '\033[1m'
 
 
-
 def quit_script(msg,exitcode):
     """ Exit with a message and exitcode. The message is displayed in red."""
     msg = "\n" + msg + "\n"
@@ -30,12 +29,10 @@ def clear_screen():
     os.system('clear')
     
     
-    
 # (Uses a bcolor as the colour argument)
 def write_in_color(msg,color):
     """ Write to stdout in a given colour. The colour should be from the bcolors class"""
     print color + str(msg) + bcolors.ENDC
-
 
 
 def check_int(choice,max_choice):
@@ -49,7 +46,8 @@ def check_int(choice,max_choice):
         return None
     
     
-    
 def display_all_modules():
     available_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
     return str(available_modules)
+
+
