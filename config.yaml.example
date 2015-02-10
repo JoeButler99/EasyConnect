@@ -23,7 +23,7 @@ hosts:
   Local:
     - localhost
     - 127.0.0.1
-  Application:
+  MadeUpApp:
     Dev:
       - dev01.app.name.com
       - dev02.app.name.com
