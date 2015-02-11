@@ -4,7 +4,7 @@ config:
   # Binaries - These are the programs called to handle various actions.
   # You may also wish to add any arguments or static parameters here too 
   #
-  terminal_binary:     "/usr/bin/xfce4-terminal"
+  terminal_binary:     "/usr/bin/xfce4-terminal -e "
   browser_binary:      "/usr/bin/google-chrome"
   ssh-copy-id-binary:  "/usr/bin/ssh-copy-id"
   log_file:            "easyconnect.log"

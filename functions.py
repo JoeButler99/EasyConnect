@@ -34,19 +34,6 @@ def write_in_color(msg,color):
     print color + str(msg) + bcolors.ENDC
 
 
-def check_int(choice,max_choice):
-    try:
-        c = int(choice)
-        if c >= 0 and c <= max_choice:
-            return c
-        else:
-            return None
-    except:
-        return None
-
-
-
-
 class ModuleParser:
     """ 
         Module parsers reaches into the modules.py file and grabs information
@@ -55,6 +42,7 @@ class ModuleParser:
     def __init__(self):
         raw_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
         self.module_info = []
+        self.action_map  = {}
         for classname , classreference in sorted(raw_modules.items()):
             d = {'classreference' : classreference,
                  'classname'      : classname, 
@@ -73,6 +61,9 @@ class ModuleParser:
         for module in self.module_info:
             for method in module['classmethods']:
                 method['actionkey'] = chr(self.start_char)
+                self.action_map[chr(self.start_char)] = {'classname'  : module['classname'],
+                                                         'methodname' : method['methodname'],
+                                                         'action_str' : module['classname'] + "::" + method['methodname']}
                 self.start_char += 1
                     
         
@@ -83,7 +74,41 @@ class ModuleParser:
             for module_method in module['classmethods']:
                 print "\t\t- " + module_method['methodname']
         print
+        
+    
+
+
+def check_int(choice,max_choice):
+    try:
+        c = int(choice)
+        if c >= 0 and c <= max_choice:
+            return c
+        else:
+            return None
+    except:
+        return None
+
+
+def parse_menu_action(choice_string,menu_members):
+    """
+            parse_menu_action needs to return
             
+            valid , host_indexes , action_name
             
+    """
+    module_parser = ModuleParser()
+    if len(choice_string) == 1:
+        # One action, all hosts
+        if module_parser.action_map.has_key(choice_string):
+            return ( True , 
+                     [x for x in range(len(menu_members))] , 
+                     module_parser.action_map[choice_string]['action_str'] )
+        
+    print len(choice_string)
+    print choice_string
+    print menu_members
+    
+    
+    
             
             

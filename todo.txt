@@ -11,3 +11,4 @@ merge quit_script and Exception throwing into consistent system
 messaging system on menu so warnings and errors can be displayed
 collecing_log_files_remote location and doing stuff to them
 decide on consistent comment system
+testsuite

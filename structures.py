@@ -1,6 +1,6 @@
 import inspect
 import sys
-from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int
+from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action
 from modules import *
 
 class Host:
@@ -97,12 +97,18 @@ class HostGroup:
             else:
                 self.members[ichoice-1].action()
                 return True
-#         else:
-#             achoice = self.check_action(choice)
-#             if achoice:
-#                 achoice.action()
-#             else:
-#                 write_in_color("\nBAD CHOICE!\n",bcolors.FAIL)
+        else:
+            valid , host_indexes , action_name = parse_menu_action(choice,self.members)
+            if valid:
+                # TODO - Sanity check, logging here
+                write_in_color("\nRunning - " + action_name+"\n", bcolors.OKGREEN)
+                for host_index in host_indexes:
+                    self.members[host_index].action(action_name)
+                print "\n"
+                return True
+            else:
+                write_in_color("\nBAD CHOICE!\n",bcolors.FAIL)
+                return False
 
 
 def build_from_config(config,parent,yaml_config):
