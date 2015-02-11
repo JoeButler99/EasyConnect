@@ -1,6 +1,5 @@
 import sys
 import os
-from modules import *
 import inspect
 
 
@@ -44,32 +43,45 @@ def check_int(choice,max_choice):
             return None
     except:
         return None
-    
-    
+
 
 
 
 class ModuleParser:
+    """ 
+        Module parsers reaches into the modules.py file and grabs information
+        about all the classes and their methods inside.
+    """
     def __init__(self):
         raw_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
         self.module_info = []
-        # Polish up and fill the self.module_info var
         for classname , classreference in sorted(raw_modules.items()):
             d = {'classreference' : classreference,
                  'classname'      : classname, 
                  'classmethods'   : []}
             for methoditem in inspect.getmembers(classreference):
                 if methoditem[0][0] != "_": # skip private and other types of method
-                    d['classmethods'].append(methoditem)
+                    method_info = {'methodname' : methoditem[0],
+                                   'methodreference' : methoditem[1]}
+                    d['classmethods'].append(method_info)
             self.module_info.append(d)
+            
+        # Auto assign a character to each action. (TODO)
+        # This is outside of the above loop as ultimately I'd like a better way 
+        # of doing this.
+        self.start_char = 97
+        for module in self.module_info:
+            for method in module['classmethods']:
+                method['actionkey'] = chr(self.start_char)
+                self.start_char += 1
                     
         
     def display_all_modules(self):
         write_in_color("\nModule\t\tActions", bcolors.OKGREEN) 
-        for module_info in self.module_info:
-            write_in_color("\n"+module_info['classname'], bcolors.WARNING)
-            for module_method in module_info['classmethods']:
-                print "\t\t- " + module_method[0]
+        for module in self.module_info:
+            write_in_color("\n"+module['classname'], bcolors.WARNING)
+            for module_method in module['classmethods']:
+                print "\t\t- " + module_method['methodname']
         print
             
             

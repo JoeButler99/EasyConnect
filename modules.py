@@ -13,6 +13,11 @@ import nmap
         
         Each method should have the required args of hostname and config in addition
         to self.
+        
+        The method names will be polished up to be used as actions so brief but descriptive is good
+        
+        Method names prefixed with '_' are not included, and they will be considered a 'private' 
+        method.
 """
 
 
@@ -25,16 +30,7 @@ class Shell:
         command = "{0} 'ssh {1}@{2}' ".format(config['terminal_binary'],
                                                   config['default_user'], 
                                                   hostname)
-        test = os.system(command)
-        print command
-        
-        
-        p = subprocess.Popen(command,shell=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT)
-        p.wait()
-        print p.__dict__
-        print p.pid
+        os.system(command)
 
 
 
