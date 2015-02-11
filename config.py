@@ -6,7 +6,7 @@ Created on 24 Jan 2015
 import os
 import yaml
 import argparse
-from functions import quit_script, display_all_modules
+from functions import quit_script, ModuleParser
 from structures import Host
 
 class YAMLConfigLoader:
@@ -57,7 +57,7 @@ class CLIParser:
         parser.add_argument("-g", "--group", action="store", dest="group", required=True,type=str)
         parser.add_argument("-a", "--action", action="store", dest="action", required=True,type=str)
         # Cheat below - I've 'repurposed' the version exception to handle module listing
-        parser.add_argument("-l", "--list-available-actions", action="version", version=display_all_modules())
+        parser.add_argument("-l", "--list-available-actions", action="version", version=ModuleParser().display_all_modules())
         
         return parser
     

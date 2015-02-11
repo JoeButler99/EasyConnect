@@ -46,8 +46,32 @@ def check_int(choice,max_choice):
         return None
     
     
-def display_all_modules():
-    available_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
-    return str(available_modules)
 
 
+
+class ModuleParser:
+    def __init__(self):
+        raw_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
+        self.module_info = []
+        # Polish up and fill the self.module_info var
+        for classname , classreference in sorted(raw_modules.items()):
+            d = {'classreference' : classreference,
+                 'classname'      : classname, 
+                 'classmethods'   : []}
+            for methoditem in inspect.getmembers(classreference):
+                if methoditem[0][0] != "_": # skip private and other types of method
+                    d['classmethods'].append(methoditem)
+            self.module_info.append(d)
+                    
+        
+    def display_all_modules(self):
+        write_in_color("\nModule\t\tActions", bcolors.OKGREEN) 
+        for module_info in self.module_info:
+            write_in_color("\n"+module_info['classname'], bcolors.WARNING)
+            for module_method in module_info['classmethods']:
+                print "\t\t- " + module_method[0]
+        print
+            
+            
+            
+            
