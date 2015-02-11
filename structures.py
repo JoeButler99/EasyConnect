@@ -110,13 +110,13 @@ def build_from_config(config,parent,yaml_config):
         Takes a yaml config, and recurses over the hosts to
         replicate the groups and hosts structure.
     """
-    for name , members in config.iteritems():
+    for name , members in sorted(config.items()):
         hg = HostGroup(name,yaml_config,parent=parent)
         if isinstance(members, dict):
             build_from_config(members, hg,yaml_config)
         else:
             if not members:
                 quit_script("Error in config.yaml - group '{0}' has no members".format(name), 3)
-            for hostname in members:
+            for hostname in sorted(members):
                 hg.add_member(Host(hostname,yaml_config))
         parent.add_member(hg)
