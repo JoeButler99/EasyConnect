@@ -13,10 +13,19 @@ import subprocess
 """
 
 
+   
+
+
 class Shell:
     def open_ssh_terminal(self,hostname,config):
         config  = config.get_section('config')
         command = "{0} -e 'ssh {1}@{2}' &".format(config['terminal_binary'],
                                                   config['default_user'], 
                                                   hostname)
-        test = os.system(command)
+        #test = os.system(command)
+        p = subprocess.Popen(command,shell=True,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT)
+        p.wait()
+        print p.__dict__
+        print p.pid
