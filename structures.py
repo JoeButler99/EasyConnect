@@ -1,6 +1,6 @@
 import inspect
 import sys
-from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action
+from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action, ModuleParser
 from modules import *
 
 class Host:
@@ -43,11 +43,15 @@ class Host:
 
 class HostGroup:
     def __init__(self,name,config,parent=None,prompt="Select Choice: "):
-        self.name       = name
-        self.members    = []
-        self.parent     = parent
-        self.prompt     = prompt
-        self.catch_menu = False
+        self.name        = name
+        self.members     = []
+        self.parent      = parent
+        self.prompt      = prompt
+        self.catch_menu  = False
+        self.last_output = None
+        self.module_parser = ModuleParser() # TODO - Should this be global
+        
+        
 
     def add_member(self,member):
         if isinstance(member, Host) or isinstance(member, HostGroup):
@@ -60,20 +64,36 @@ class HostGroup:
 
     def display_menu(self):
         while True:
-            #clear_screen()
+            clear_screen()
             try:
+                # Check if we have a group of hostgroups or a
+                # group of hosts
+                hosts_only = False
+                action_msg = "(Recurse Hosts)"
+                if isinstance(self.members[0],Host):
+                    hosts_only = True
+                    action_msg = "(All Hosts in Group)"
+                
                 # Create the display
                 max_choice = 1
                 write_in_color("\t" + self.name +"\n", bcolors.WARNING)
                 for entry in self.members:
                     print "  " + str(max_choice) ,")" , entry.name 
-                    max_choice += 1
+                    max_choice += 1                
+                    
+                # Display any hosts actions
+                
+                write_in_color("\n  Key\tAction\n",bcolors.BOLD)
+                for letter , data in self.module_parser.action_map.iteritems():
+                    print "  {0} )\t{1: <30} - {2}".format(letter,data['action_str'],action_msg)
                 
                 # Create a 'back' system
                 if self.parent == None:
                     print "\n  0) Exit to System.\n"
                 else:
-                    print "\n  0) Back to %s\n" % self.parent.name
+                    print "\n  0) Back to {0}\n".format(self.parent.name)
+                
+                
                 # Handle 'back' request           
                 if self.wait_for_choice(max_choice) == None:
                     if self.parent:
@@ -89,7 +109,8 @@ class HostGroup:
         """
             Get the users input and do their bidding
         """
-        choice = raw_input(self.prompt)
+        write_in_color(self.prompt,bcolors.BOLD)
+        choice = raw_input()
         ichoice = check_int(choice,max_choice)
         if ichoice != None:
             if ichoice == 0:
@@ -107,6 +128,7 @@ class HostGroup:
                 print "\n"
                 return True
             else:
+                
                 write_in_color("\nBAD CHOICE!\n",bcolors.FAIL)
                 return False
 
