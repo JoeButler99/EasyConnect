@@ -31,6 +31,13 @@ class Shell:
                                                   config['default_user'], 
                                                   hostname)
         os.system(command)
+    
+    def open_in_browser(self,hostname,config):
+        config  = config.get_section('config')
+        command = "{0} 'ssh {1}@{2}' ".format(config['terminal_binary'],
+                                                  config['default_user'], 
+                                                  hostname)
+        os.system(command)
 
 
 

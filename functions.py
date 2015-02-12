@@ -29,9 +29,12 @@ def clear_screen():
     
     
 # (Uses a bcolor as the colour argument)
-def write_in_color(msg,color):
+def write_in_color(msg,color,surpress_newline=False):
     """ Write to stdout in a given colour. The colour should be from the bcolors class"""
-    print color + str(msg) + bcolors.ENDC
+    if surpress_newline:
+        print color + str(msg) + bcolors.ENDC,
+    else:
+        print color + str(msg) + bcolors.ENDC
 
 
 class ModuleParser:
@@ -97,17 +100,39 @@ def parse_menu_action(choice_string,menu_members):
             
     """
     module_parser = ModuleParser()
+    print choice_string
+    if len(choice_string) == 0:
+        return (False, [], None)
     if len(choice_string) == 1:
         # One action, all hosts
         if module_parser.action_map.has_key(choice_string):
             return ( True , 
                      [x for x in range(len(menu_members))] , 
                      module_parser.action_map[choice_string]['action_str'] )
+    elif len(choice_string) >= 2:
+        # Grab the action
+        action_char = choice_string[0]
+        if module_parser.action_map.has_key(action_char):
+            action_str = module_parser.action_map[action_char]['action_str']
         
-    print len(choice_string)
-    print choice_string
-    print menu_members
+            # Figure out the hosts to work on
+            host_indexes = []
+            for host_id in choice_string[1:].split(","):
+                if int(host_id) -1 >= 0 and int(host_id) -1 < len(menu_members):
+                    host_indexes.append(int(host_id) -1)
+                else: 
+                    return (False, [], "Error with choice: {0}".format(choice_string))
+            return (True,host_indexes,action_str)
+                
+            
+        
+        
+        choice_string = choice_string[1:]
     
+    # We met an error above
+    return (False, [], "Error with choice: {0}".format(choice_string))
+        
+
     
     
             

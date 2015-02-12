@@ -49,7 +49,7 @@ class HostGroup:
         self.prompt      = prompt
         self.catch_menu  = False
         self.last_output = None
-        self.module_parser = ModuleParser() # TODO - Should this be global
+        self.module_parser = ModuleParser() # TODO - Should this be a global instance
         
         
 
@@ -68,31 +68,35 @@ class HostGroup:
             try:
                 # Check if we have a group of hostgroups or a
                 # group of hosts
-                hosts_only = False
-                action_msg = "(Recurse Hosts)"
                 if isinstance(self.members[0],Host):
                     hosts_only = True
                     action_msg = "(All Hosts in Group)"
+                else:
+                    hosts_only = False
+                    action_msg = "(Recurse Hosts)"
+                    
                 
                 # Create the display
                 max_choice = 1
                 write_in_color("\t" + self.name +"\n", bcolors.WARNING)
+                write_in_color("\n  No.\tName",bcolors.BOLD)
                 for entry in self.members:
-                    print "  " + str(max_choice) ,")" , entry.name 
+                    if hosts_only:
+                        print "  {0} )\t{1: <30} - {2}".format(max_choice,entry.name,"(Host)")
+                    else:
+                        print "  {0} )\t{1: <30} - {2}".format(max_choice,entry.name,"(Group)")
                     max_choice += 1                
                     
                 # Display any hosts actions
-                
-                write_in_color("\n  Key\tAction\n",bcolors.BOLD)
+                write_in_color("\n  Key\tAction",bcolors.BOLD)
                 for letter , data in self.module_parser.action_map.iteritems():
                     print "  {0} )\t{1: <30} - {2}".format(letter,data['action_str'],action_msg)
                 
                 # Create a 'back' system
                 if self.parent == None:
-                    print "\n  0) Exit to System.\n"
+                    print "\n  0 )\tExit to System.\n"
                 else:
-                    print "\n  0) Back to {0}\n".format(self.parent.name)
-                
+                    print "\n  0 )\tBack to {0}\n".format(self.parent.name)
                 
                 # Handle 'back' request           
                 if self.wait_for_choice(max_choice) == None:
@@ -103,13 +107,14 @@ class HostGroup:
                 self.catch_menu = False
                             
             except KeyboardInterrupt:
-                quit_script("Exit requested.",0)
+                write_in_color("\n\nExit requested.", bcolors.FAIL)
+                quit_script("",0)
 
     def wait_for_choice(self,max_choice):
         """
             Get the users input and do their bidding
         """
-        write_in_color(self.prompt,bcolors.BOLD)
+        write_in_color(self.prompt,bcolors.BOLD,surpress_newline=True)
         choice = raw_input()
         ichoice = check_int(choice,max_choice)
         if ichoice != None:
