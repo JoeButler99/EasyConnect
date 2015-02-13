@@ -1,12 +1,13 @@
 import inspect
 import sys
-import modules
-from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action, ModuleParser, Tee
+import action_modules
+from utilities import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action, ModuleParser, Tee
 
 class Host:
     def __init__(self,hostname,config):
-        self.name         = hostname
-        self.config       = config
+        self.name          = hostname
+        self.config        = config
+        self.module_parser = None
         
     def action(self,action_name=None):
         """
@@ -14,7 +15,8 @@ class Host:
             will try to dynamically instantiate a class and excute the
             required method.
         """
-        available_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
+        if not self.module_parser:
+            module_parser = ModuleParser()
         
         # Make sure we have a module to execute
         if not action_name:
@@ -31,11 +33,11 @@ class Host:
                 quit_script("Could not perform action {0}. Does this exist in modules?".format(action_name), 5)
         else:
             classname , methodname = parts
-        if classname not in available_modules.keys():
+        if classname not in module_parser.get_class_dict().keys():
             quit_script("Could not find class {0} in modules".format(classname), 5)
         
         # Create a class instance and check the method exists.
-        action_module = available_modules[classname]()
+        action_module = module_parser.get_class_dict()[classname]['classreference']()
         method = getattr(action_module, methodname)
         method(self.name,self.config)
         

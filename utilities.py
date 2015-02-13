@@ -49,8 +49,9 @@ class ModuleParser:
         about all the classes and their methods inside.
     """
     def __init__(self):
-        raw_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['modules'], inspect.isclass)}
+        raw_modules = { x[0] : x[1] for x in inspect.getmembers(sys.modules['action_modules'], inspect.isclass)}
         self.module_info = []
+        self.class_dict  = {}
         self.action_map  = {}
         for classname , classreference in sorted(raw_modules.items()):
             d = {'classreference' : classreference,
@@ -83,7 +84,17 @@ class ModuleParser:
             for module_method in module['classmethods']:
                 print "\t\t- " + module_method['methodname']
         print
-
+        
+    def get_class_dict(self):
+        """
+               Return a dict of the module info list indexed by the class names
+        """
+        if not self.class_dict:
+            for module in self.module_info:
+                self.class_dict[module['classname']] = {}
+                self.class_dict[module['classname']]['classmethods'] = module['classmethods']
+                self.class_dict[module['classname']]['classreference'] = module['classreference'] 
+        return self.class_dict
 
 class Tee(object):
     """ 

@@ -3,10 +3,11 @@ Created on 24 Jan 2015
 
 @author: joe
 '''
+import sys
 import os
 import yaml
 import argparse
-from functions import quit_script, ModuleParser
+from utilities import quit_script, ModuleParser
 from structures import Host
 
 class YAMLConfigLoader:
@@ -51,14 +52,20 @@ class CLIParser:
             for host in group:
                 host_list.append(host)
         return host_list
+        
+    class ModuleListAction(argparse.Action):
+        """ Use a custom action for the --list arg """
+        def __call__(self, parser, namespace, values, option_string=None):
+            ModuleParser().display_all_modules()
+            sys.exit()
+        
     
     def create_parser(self):
         parser = argparse.ArgumentParser(description="EasyConnect CLI Toolkit")
         parser.add_argument("-g", "--group", action="store", dest="group", required=True,type=str)
         parser.add_argument("-a", "--action", action="store", dest="action", required=True,type=str)
         # Cheat below - I've 'repurposed' the version exception to handle module listing
-        parser.add_argument("-l", "--list-available-actions", action="version", version=ModuleParser().display_all_modules())
-        
+        parser.add_argument("-l", "--list-available-actions", action=self.ModuleListAction,nargs=0)
         return parser
     
     def run(self,yaml_config):

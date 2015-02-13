@@ -15,3 +15,4 @@ testsuite
 kwargs_for_modules and an override system from the action select menu
 tail remote log over ssh
 add a way to save favourite log files to system
+make the module list show the action_str
