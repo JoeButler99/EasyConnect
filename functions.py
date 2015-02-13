@@ -102,6 +102,10 @@ class Tee(object):
     def write(self, data):
         self.file.write(data)
         self.stdout.write(data)
+        
+    def flush(self):
+        self.file.flush()
+        self.stdout.flush()
 
 
 def check_int(choice,max_choice):

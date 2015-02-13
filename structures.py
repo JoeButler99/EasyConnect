@@ -64,10 +64,9 @@ class HostGroup:
         
     def display_last_output(self):
         if self.last_output:
-            write_in_color("="*40, bcolors.BOLD)
-            print self.last_output
-            write_in_color("="*40, bcolors.BOLD)
-            print
+            write_in_color("_"*60, bcolors.BOLD)
+            print self.last_output.rstrip() # Sometimes lots of extra spacing we don't need
+            print "\n" + write_in_color("_"*60, bcolors.BOLD,return_only=True) + "\n"
             self.last_output = None
 
     def display_menu(self):
