@@ -1,7 +1,7 @@
 import inspect
 import sys
-from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action, ModuleParser
-from modules import *
+import modules
+from functions import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action, ModuleParser, Tee
 
 class Host:
     def __init__(self,hostname,config):
@@ -61,10 +61,19 @@ class HostGroup:
         
     def action(self):
         self.display_menu()
+        
+    def display_last_output(self):
+        if self.last_output:
+            write_in_color("="*40, bcolors.BOLD)
+            print self.last_output
+            write_in_color("="*40, bcolors.BOLD)
+            print
+            self.last_output = None
 
     def display_menu(self):
         while True:
             clear_screen()
+            self.display_last_output()
             try:
                 # Check if we have a group of hostgroups or a
                 # group of hosts
@@ -78,7 +87,7 @@ class HostGroup:
                 
                 # Create the display
                 max_choice = 1
-                write_in_color("\t" + self.name +"\n", bcolors.WARNING)
+                write_in_color("\tMenu: " + self.name +"\n", bcolors.WARNING)
                 write_in_color("\n  No.\tName",bcolors.BOLD)
                 for entry in self.members:
                     if hosts_only:
@@ -89,7 +98,7 @@ class HostGroup:
                     
                 # Display any hosts actions
                 write_in_color("\n  Key\tAction",bcolors.BOLD)
-                for letter , data in self.module_parser.action_map.iteritems():
+                for letter , data in sorted(self.module_parser.action_map.items()):
                     print "  {0} )\t{1: <30} - {2}".format(letter,data['action_str'],action_msg)
                 
                 # Create a 'back' system
@@ -128,10 +137,14 @@ class HostGroup:
             if valid:
                 # TODO - Sanity check, logging here
                 write_in_color("\nRunning - " + action_name+"\n", bcolors.OKGREEN)
+                sys.stdout = t = Tee()
+                t.file.write(write_in_color("\nResult - " + action_name+"\n\n", bcolors.OKGREEN,return_only=True))
                 for host_index in host_indexes:
                     self.members[host_index].action(action_name)
                 print "\n"
+                self.last_output = t.file.getvalue()
                 return True
+                
             else:
                 
                 write_in_color("\nBAD CHOICE!\n",bcolors.FAIL)

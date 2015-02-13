@@ -19,24 +19,20 @@ import nmap
         Method names prefixed with '_' are not included, and they will be considered a 'private' 
         method.
 """
-
-
    
 
 
 class Shell:
     def open_ssh_terminal(self,hostname,config):
         config  = config.get_section('config')
-        command = "{0} 'ssh {1}@{2}' ".format(config['terminal_binary'],
+        command = "{0} 'ssh {1}@{2}' &".format(config['terminal_binary'],
                                                   config['default_user'], 
                                                   hostname)
         os.system(command)
     
     def open_in_browser(self,hostname,config):
         config  = config.get_section('config')
-        command = "{0} 'ssh {1}@{2}' ".format(config['terminal_binary'],
-                                                  config['default_user'], 
-                                                  hostname)
+        command = "{0} {1} 2&1 > /dev/null  &".format(config['browser_binary'],hostname)
         os.system(command)
 
 

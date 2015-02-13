@@ -1,6 +1,7 @@
 import sys
 import os
 import inspect
+import StringIO
 
 
 class bcolors:
@@ -29,12 +30,17 @@ def clear_screen():
     
     
 # (Uses a bcolor as the colour argument)
-def write_in_color(msg,color,surpress_newline=False):
+def write_in_color(msg,color,surpress_newline=False,return_only=False):
     """ Write to stdout in a given colour. The colour should be from the bcolors class"""
+    msg = color + str(msg) + bcolors.ENDC
+    
+    if return_only:
+        return msg
+    
     if surpress_newline:
-        print color + str(msg) + bcolors.ENDC,
+        print msg,
     else:
-        print color + str(msg) + bcolors.ENDC
+        print msg
 
 
 class ModuleParser:
@@ -77,8 +83,25 @@ class ModuleParser:
             for module_method in module['classmethods']:
                 print "\t\t- " + module_method['methodname']
         print
+
+
+class Tee(object):
+    """ 
+        Used to duplicate STDOUT in places where we'd like to redirect print
+        as well have have the STDOUT appear in real time
+    """         
+    def __init__(self):
+        self.file = StringIO.StringIO()
+        self.stdout = sys.stdout
+        sys.stdout = self
         
-    
+    def __del__(self):
+        sys.stdout = self.stdout
+        self.file.close()
+        
+    def write(self, data):
+        self.file.write(data)
+        self.stdout.write(data)
 
 
 def check_int(choice,max_choice):
