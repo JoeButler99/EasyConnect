@@ -3,6 +3,7 @@ import sys
 import action_modules
 from utilities import clear_screen,  write_in_color, bcolors, quit_script, check_int, parse_menu_action, ModuleParser, Tee
 
+
 class Host:
     def __init__(self,hostname,config):
         self.name          = hostname
@@ -41,6 +42,9 @@ class Host:
         method = getattr(action_module, methodname)
         method(self.name,self.config)
         
+    def expand_hostgroups(self,*args, **kwargs):
+        return expand_hostgroups(*args, **kwargs) # Call the helper function
+        
         
 
 class HostGroup:
@@ -52,8 +56,7 @@ class HostGroup:
         self.catch_menu  = False
         self.last_output = None
         self.module_parser = ModuleParser() # TODO - Should this be a global instance
-        
-        
+    
 
     def add_member(self,member):
         if isinstance(member, Host) or isinstance(member, HostGroup):
@@ -63,6 +66,9 @@ class HostGroup:
         
     def action(self):
         self.display_menu()
+        
+    def expand_hostgroups(self,*args, **kwargs):
+        return expand_hostgroups(*args, **kwargs) # Call the helper function
         
     def display_last_output(self):
         if self.last_output:
@@ -134,16 +140,16 @@ class HostGroup:
                 self.members[ichoice-1].action()
                 return True
         else:
-            valid , host_indexes , action_name = parse_menu_action(choice,self.members)
+            valid , host_list , action_name = parse_menu_action(choice,self.members)
             if valid:
                 # TODO - Sanity check, logging here
                 write_in_color("\nRunning - " + action_name+"\n", bcolors.OKGREEN)
                 sys.stdout = t = Tee()
-                t.file.write(write_in_color("\nResult - " + action_name+"\n\n", bcolors.OKGREEN,return_only=True))
-                for host_index in host_indexes:
-                    self.members[host_index].action(action_name)
-                print "\n"
+                t.file.write(write_in_color("\nstdout - " + action_name+"\n\n", bcolors.OKGREEN,return_only=True))
+                for host in set(host_list): # Convert to set to guarantee no dupe actions
+                    host.action(action_name)
                 self.last_output = t.file.getvalue()
+                print "\n"
                 return True
                 
             else:
@@ -167,3 +173,19 @@ def build_from_config(config,parent,yaml_config):
             for hostname in sorted(members):
                 hg.add_member(Host(hostname,yaml_config))
         parent.add_member(hg)
+        
+        
+        
+def expand_hostgroups(host_indexes,menu_members,hostlist=[]):
+    """ 
+        Given a list of menu_members and required indexes
+        return a final list all selected hosts. 
+    """
+    for index in host_indexes:
+        if isinstance(menu_members[index],HostGroup):
+            expand_hostgroups([x for x in range(len(menu_members[index].members))], 
+                              menu_members[index].members, 
+                              hostlist)
+        else:
+            hostlist.append(menu_members[index])
+    return hostlist

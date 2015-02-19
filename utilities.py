@@ -107,9 +107,17 @@ class Tee(object):
         sys.stdout = self
         
     def __del__(self):
-        sys.stdout = self.stdout
-        self.file.close()
-        
+        try:
+            sys.stdout = self.stdout
+            self.file.close()
+        except:
+            """
+                The above can sometimes throw when exiting the program
+                We REALLY don't care about this, but may as well surpress
+                the error
+            """
+            pass 
+            
     def write(self, data):
         self.file.write(data)
         self.stdout.write(data)
@@ -130,6 +138,7 @@ def check_int(choice,max_choice):
         return None
 
 
+
 def parse_menu_action(choice_string,menu_members):
     """
             parse_menu_action needs to return
@@ -144,9 +153,10 @@ def parse_menu_action(choice_string,menu_members):
     if len(choice_string) == 1:
         # One action, all hosts
         if module_parser.action_map.has_key(choice_string):
-            return ( True , 
-                     [x for x in range(len(menu_members))] , 
-                     module_parser.action_map[choice_string]['action_str'] )
+            host_indexes = [x for x in range(len(menu_members))]
+            # Reach into any Host or HostGroup object and ask them to recursively collapse into a list
+            run_hosts    = menu_members[0].expand_hostgroups(host_indexes,menu_members)
+            return ( True, run_hosts, module_parser.action_map[choice_string]['action_str'] )
     elif len(choice_string) >= 2:
         # Grab the action
         action_char = choice_string[0]
@@ -160,7 +170,8 @@ def parse_menu_action(choice_string,menu_members):
                     host_indexes.append(int(host_id) -1)
                 else: 
                     return (False, [], "Error with choice: {0}".format(choice_string))
-            return (True,host_indexes,action_str)
+            run_hosts    = menu_members[0].expand_hostgroups(host_indexes,menu_members)
+            return (True,run_hosts,action_str)
                 
             
         

@@ -16,3 +16,5 @@ kwargs_for_modules and an override system from the action select menu
 tail remote log over ssh
 add a way to save favourite log files to system
 make the module list show the action_str
+
+Occasional exit error - Exception AttributeError: "'NoneType' object has no attribute 'stdout'" in <bound method Tee.__del__ of <utilities.Tee object at 0x7f02309c03d0>> ignored
